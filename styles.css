@@ -238,11 +238,7 @@ section {
     background: var(--bg-color);
     opacity: .8;
 }
-.line{
-    width: 100vw;
-    height: 0.1px;
-    background-color: rgba(255, 255, 255, 0.274);
-}
+
 .about {
     display: flex;
     justify-content: center;
@@ -591,13 +587,19 @@ margin-bottom: 4rem;
     color: var(--second-bg-color);
 }
 
-
+#line{
+    width: 100vw;
+    height: 1px;
+    background-color: white;
+}
 
 .contact {
     min-height: auto;
     padding-bottom: 7rem;
 }
 .contact h2 {
+    display: inline-block;
+    position: relative;
     display: inline-block;
     left: 50%;
     transform: translateX(-50%);
