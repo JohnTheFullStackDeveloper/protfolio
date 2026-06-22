@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Prakash — Digital Architect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #08080a;
+            --text: #f5f5f7;
+            --muted: #86868b;
+            --accent: #7c3aed;
+            --accent-light: #a78bfa;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            perspective: 1000px; /* Crucial for 3D scroll effects */
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Syne', sans-serif;
+        }
+
+        /* 3D Background Elements */
+        .bg-layer {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            transition: transform 0.1s ease-out;
+        }
+        .orb-1 { width: 600px; height: 600px; background: #7c3aed; top: -10%; left: -10%; }
+        .orb-2 { width: 500px; height: 500px; background: #2563eb; bottom: -10%; right: -10%; }
+        .orb-3 { width: 400px; height: 400px; background: #db2777; top: 40%; left: 50%; opacity: 0.2; }
+        
+        .grid-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(circle at center, black 0%, transparent 70%);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            z-index: 100;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: rgba(8, 8, 10, 0.6);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.02em;
+        }
+        .nav-links a {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-left: 2rem;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--text); }
+
+        /* Hero Section (3D Split) */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 4rem;
+            position: relative;
+        }
+        .hero-label {
+            color: var(--accent-light);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .hero-label::before {
+            content: '';
+            width: 30px;
+            height: 1px;
+            background: var(--accent-light);
+        }
+        .hero-title {
+            font-size: clamp(3rem, 10vw, 8rem);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            margin-bottom: 2rem;
+            transition: transform 0.1s ease-out;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-desc {
+            max-width: 500px;
+            color: var(--muted);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+        }
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+        }
+        .btn {
+            padding: 1rem 2rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background: var(--text);
+            color: var(--bg);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,255,255,0.2); }
+        .btn-ghost {
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-ghost:hover { border-color: var(--text); }
+
+        /* Projects 3D List */
+        .projects-section {
+            padding: 8rem 4rem;
+            position: relative;
+        }
+        .section-header {
+            margin-bottom: 5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .section-title {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+        
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .project-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: transform 0.1s linear, border-color 0.3s ease, background 0.3s ease;
+            transform-style: preserve-3d;
+            will-change: transform;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .project-card:hover {
+            border-color: var(--accent);
+            background: rgba(124, 58, 237, 0.05);
+        }
+        .project-info {
+            max-width: 60%;
+        }
+        .project-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .tag {
+            font-size: 0.75rem;
+            color: var(--accent-light);
+            background: rgba(124, 58, 237, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+        }
+        .project-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .project-desc {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .project-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        .project-link {
+            color: var(--muted);
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .project-link:hover { color: var(--text); }
+
+        /* Stats Marquee */
+        .marquee {
+            padding: 4rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 30s linear infinite;
+        }
+        .marquee-item {
+            font-family: 'Syne', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 2rem;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        .marquee-item:hover { opacity: 1; }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Contact */
+        .contact-section {
+            padding: 12rem 4rem;
+            text-align: center;
+            position: relative;
+        }
+        .contact-title {
+            font-size: clamp(3rem, 12vw, 10rem);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            margin-bottom: 3rem;
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { display: none; }
+            .hero, .projects-section, .contact-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+            .project-card { flex-direction: column; align-items: flex-start; gap: 2rem; }
+            .project-info { max-width: 100%; }
+            .project-links { flex-direction: row; width: 100%; justify-content: space-between; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Parallax Background -->
+    <div class="bg-layer">
+        <div class="grid-overlay"></div>
+        <div class="orb orb-1" id="orb1"></div>
+        <div class="orb orb-2" id="orb2"></div>
+        <div class="orb orb-3" id="orb3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">JP.</div>
+        <div class="nav-links">
+            <a href="#work">Work</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="about">
+        <div class="hero-label">Available for Work</div>
+        <h1 class="hero-title" id="heroTitle">
+            Digital<br>
+            <span class="gradient-text">Architect.</span>
+        </h1>
+        <p class="hero-desc">
+            I'm John Prakash. I engineer immersive web ecosystems, cross-platform mobile apps, and scalable backend structures. Specialized in React, Flutter, and Node.js to bring high-performance ideas to life.
+        </p>
+        <div class="hero-cta">
+            <a href="#work" class="btn btn-primary">View Work <i class="fas fa-arrow-down"></i></a>
+            <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+        </div>
+    </section>
+
+    <!-- Infinite Marquee -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <span class="marquee-item">React</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Flutter</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Node.js</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Android</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Firebase</span>
+            <span class="marquee-item">/</span>
+            <!-- Duplicate for infinite loop -->
+            <span class="marquee-item">React</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Flutter</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Node.js</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Android</span>
+            <span class="marquee-item">/</span>
+            <span class="marquee-item">Firebase</span>
+            <span class="marquee-item">/</span>
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <section class="projects-section" id="work">
+        <div class="section-header">
+            <h2 class="section-title">Featured<br>Builds.</h2>
+            <p style="color: var(--muted); max-width: 300px; text-align: right;">A selection of products engineered for scale, speed, and seamless user experience.</p>
+        </div>
+
+        <div class="project-list" id="projectList">
+            <!-- Project 1 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">Flutter</span>
+                        <span class="tag">Node.js</span>
+                        <span class="tag">MongoDB</span>
+                    </div>
+                    <h3 class="project-title">Zynto — Canteen OS</h3>
+                    <p class="project-desc">A production-ready college canteen ordering system live on the Play Store. Skips queues with advance ordering and features real-time admin management built for high-traffic peak hours.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link"><i class="fab fa-github"></i> Code</a>
+                    <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">React</span>
+                        <span class="tag">Flutter</span>
+                        <span class="tag">Firebase</span>
+                    </div>
+                    <h3 class="project-title">Tastik — Food Delivery</h3>
+                    <p class="project-desc">Cross-platform food delivery ecosystem with restaurant discovery, live order tracking, and fluid micro-animations. Engineered for frictionless iOS & Android deployment.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link"><i class="fab fa-github"></i> Code</a>
+                    <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">React</span>
+                        <span class="tag">Firebase</span>
+                        <span class="tag">Tailwind</span>
+                    </div>
+                    <h3 class="project-title">Found It — Tracker</h3>
+                    <p class="project-desc">Real-time web and mobile app to report and discover lost items. Connects owners with missing belongings in minutes via Firebase's live database infrastructure.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link"><i class="fab fa-github"></i> Code</a>
+                    <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                </div>
+            </div>
+
+            <!-- Project 4 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">React</span>
+                        <span class="tag">Node.js</span>
+                        <span class="tag">Firebase</span>
+                    </div>
+                    <h3 class="project-title">Library Management System</h3>
+                    <p class="project-desc">Full-stack library web app allowing admins to manage inventory while users browse, reserve, and favorite titles. Built with a clean, responsive, real-time interface.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link"><i class="fab fa-github"></i> Code</a>
+                    <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                </div>
+            </div>
+
+            <!-- Project 5 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">React</span>
+                        <span class="tag">Node.js</span>
+                    </div>
+                    <h3 class="project-title">Aviator — Real-time Game</h3>
+                    <p class="project-desc">A high-stakes real-time betting game where players predict a virtual plane's multiplier. Features live multipliers, auto-bet logic, and instant cashout architecture.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link"><i class="fab fa-github"></i> Code</a>
+                    <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                </div>
+            </div>
+
+            <!-- Project 6 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">Vanilla JS</span>
+                        <span class="tag">Security</span>
+                    </div>
+                    <h3 class="project-title">Steganography Tool</h3>
+                    <p class="project-desc">A security utility that hides secret messages within images using the LSB algorithm. Invisible to the naked eye, extractable only with a specific cryptographic key.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link"><i class="fab fa-github"></i> Code</a>
+                    <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                </div>
+            </div>
+
+            <!-- Project 7 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">React</span>
+                        <span class="tag">Google Maps SDK</span>
+                    </div>
+                    <h3 class="project-title">Campus Bus Tracker</h3>
+                    <p class="project-desc">Real-time campus transit tracker. Get live bus locations, dynamic route details, and precise ETA, making university commuting completely frictionless.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#" class="project-link"><i class="fab fa-github"></i> Code</a>
+                    <a href="#" class="project-link"><i class="fas fa-external-link-alt"></i> Live</a>
+                </div>
+            </div>
+            
+            <!-- Project 8 -->
+            <div class="project-card">
+                <div class="project-info">
+                    <div class="project-tags">
+                        <span class="tag">ESP32</span>
+                        <span class="tag">IoT</span>
+                        <span class="tag">Private</span>
+                    </div>
+                    <h3 class="project-title">IoT & Client Infrastructure</h3>
+                    <p class="project-desc">Architected multiple real-world systems including home automation and fingerprint attendance systems using ESP32. Technical details available upon request.</p>
+                </div>
+                <div class="project-links">
+                    <a href="#contact" class="project-link"><i class="fas fa-envelope"></i> Request</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Footer -->
+    <section class="contact-section" id="contact">
+        <h2 class="contact-title" id="contactTitle">
+            Let's build<br>
+            <span class="gradient-text">something.</span>
+        </h2>
+        <a href="mailto:johnprakash@example.com" class="btn btn-primary" style="font-size: 1.1rem; padding: 1.5rem 3rem;">
+            Get in Touch <i class="fas fa-arrow-right"></i>
+        </a>
+        
+        <div style="margin-top: 6rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 2rem; color: var(--muted); font-size: 0.85rem;">
+            <span>© 2024 John Prakash. Engineered from scratch.</span>
+            <div style="display: flex; gap: 1.5rem;">
+                <a href="#" style="color: var(--muted);"><i class="fab fa-github"></i></a>
+                <a href="#" style="color: var(--muted);"><i class="fab fa-linkedin"></i></a>
+                <a href="#" style="color: var(--muted);"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // ---------------------------------------------------------
+        // 1. 3D Scroll Parallax for Background Orbs & Hero Text
+        // ---------------------------------------------------------
+        const heroTitle = document.getElementById('heroTitle');
+        const contactTitle = document.getElementById('contactTitle');
+        const orbs = [
+            { el: document.getElementById('orb1'), speed: 0.3 },
+            { el: document.getElementById('orb2'), speed: 0.5 },
+            { el: document.getElementById('orb3'), speed: 0.7 }
+        ];
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+
+            // Move background orbs at different speeds (Z-depth illusion)
+            orbs.forEach(orb => {
+                orb.el.style.transform = `translateY(${scrollY * orb.speed}px) scale(${1 + scrollY * 0.0005})`;
+            });
+
+            // Parallax Hero Title
+            heroTitle.style.transform = `translateY(${scrollY * 0.5}px) translateZ(-${scrollY * 0.2}px)`;
+            heroTitle.style.opacity = 1 - (scrollY / 500); // Fade out as you scroll
+
+            // Parallax Contact Title (Zoom effect as you reach the bottom)
+            const contactPosition = document.getElementById('contact').getBoundingClientRect().top;
+            const screenPosition = window.innerHeight / 2;
+            const contactDistance = (contactPosition - screenPosition) / 10;
+            if (contactPosition < screenPosition) {
+                contactTitle.style.transform = `translateZ(${Math.abs(contactDistance) * 2}px) scale(${1 + (Math.abs(contactDistance) * 0.005)})`;
+            }
+        });
+
+        // ---------------------------------------------------------
+        // 2. 3D Tilt & Fade for Project Cards on Scroll
+        // ---------------------------------------------------------
+        const projectCards = document.querySelectorAll('.project-card');
+        
+        function updateCard3D() {
+            projectCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = rect.top + (rect.height / 2);
+                const screenCenter = window.innerHeight / 2;
+                
+                // Calculate how far the card is from the center of the screen (-1 to 1)
+                const distance = (cardCenter - screenCenter) / (window.innerHeight / 2);
+                
+                // Apply 3D transforms based on distance
+                if (distance > -1.2 && distance < 1.2) {
+                    // Rotate on X axis (tilt up/down), scale down slightly when far
+                    const rotateX = distance * 15; // Max 15deg tilt
+                    const translateZ = -Math.abs(distance) * 100; // Push back in 3D space
+                    const opacity = 1 - Math.abs(distance) * 0.6; // Fade slightly when far
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) translateZ(${translateZ}px) scale(${1 - Math.abs(distance) * 0.05})`;
+                    card.style.opacity = opacity;
+                }
+            });
+        }
+
+        // Use requestAnimationFrame for smooth 3D updates
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    updateCard3D();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+        updateCard3D(); // Init on load
+
+        // ---------------------------------------------------------
+        // 3. Mouse Hover Tilt Effect for Project Cards
+        // ---------------------------------------------------------
+        projectCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; // X position within card
+                const y = e.clientY - rect.top;  // Y position within card
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateY = ((x - centerX) / centerX) * 5; // Max 5deg Y rotation
+                const rotateX = ((centerY - y) / centerY) * 5; // Max 5deg X rotation
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px) scale(1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                updateCard3D(); // Return to scroll position state
+            });
+        });
+    </script>
+</body>
+</html>
